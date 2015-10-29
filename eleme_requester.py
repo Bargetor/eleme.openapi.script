@@ -19,9 +19,9 @@ class ElemeAPIContextRequester(object):
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
-        self.base_url_path = 'v2.openapi.ele.me'
+        # self.base_url_path = 'v2.openapi.ele.me'
         #test
-        # self.base_url_path = 'v2.rhyme.alpha.elenet.me'
+        self.base_url_path = 'v2.rhyme.alpha.elenet.me'
 
 
     def base_request(self, path_url, url_params = {}, params  = {}):
@@ -179,6 +179,7 @@ class ElemeAPIContextRequester(object):
             return json.loads(response)
         except Exception, e:
             #当做重试一次吧
+            print e
             return self.__open_url(url, method, params, headers)
 
         # return response
@@ -477,7 +478,6 @@ class ElemeFoodRequester(object):
     def update_stock_by_tp_id(self, stock_info_json):
         params = {}
         params['stock_info'] = json.JSONEncoder().encode(stock_info_json)
-        params['extra'] = {}
         print params['stock_info']
 
         request_path_url = '/foods/stock/'
@@ -543,6 +543,38 @@ class ElemeImageRequester(object):
 
         return self.context_requester.base_request_upload(request_path_url, upload_params = params)
 
+class ElemeCommontRequester(object):
+    """docstring for ElemeCommontRequester"""
+    def __init__(self, context_requester, restaurant_id = None):
+        super(ElemeCommontRequester, self).__init__()
+        self.context_requester = context_requester
+        self.restaurant_id = restaurant_id
+
+    def get_comment_list(self, offset = 1, limit = 20):
+        if not self.restaurant_id:
+            return None
+
+        request_path_url = '/comment/{}/list_view/'.format(self.restaurant_id)
+
+        params = {}
+        params['offset'] = offset
+        params['limit'] = limit
+
+        return self.context_requester.base_request_get(request_path_url, url_params = params)
+
+
+    def reply(self, comment_id, content, replier_name = None):
+        if not comment_id or not self.restaurant_id:
+            return None
+
+        request_path_url = '/comment/{}/reply/'.format(self.restaurant_id)
+
+        params = {}
+        params['comment_id'] = comment_id
+        params['content'] = content
+        params['replier_name'] = replier_name
+
+        return self.context_requester.base_request_post(request_path_url, post_params = params)
 
 def main():
     application = eleme_application_set.eleme_application_set['test']
@@ -565,11 +597,11 @@ def main():
     #         print order_ids
     #         break
 
-    # print order_requester.get_order_info(100062972818966857)
+    # print order_requester.get_order_info(100106410220276161)
 
     # 餐厅相关
-    restaurant_requester = ElemeRestaurantRequester(context_requester, '68557502')
-    restaurant_requester.get_restaurant_info()
+    # restaurant_requester = ElemeRestaurantRequester(context_requester, '68557502')
+    # restaurant_requester.get_restaurant_info()
     # all_categories = restaurant_requester.get_all_categories()['data']['food_categories']
     # print all_categories
 
@@ -598,7 +630,7 @@ def main():
 
     # 食物相关
     # food_requester = ElemeFoodRequester(context_requester)
-    # stock_info_json = {"4739284732": {"432432": 100, "432423": 10}, "43242": {"43242112":399}}
+    # stock_info_json = {'4739284732': {'432432': '中文', '432423': 10}, "43242": {"43242112":399}}
     # print food_requester.update_stock_by_tp_id(stock_info_json)
 
     # print food_requester.create_new('2801170', '川菜', price = 15.5)
@@ -611,6 +643,11 @@ def main():
     # path = os.path.split(os.path.realpath(__file__))[0]
     # print image_requester.upload_image('{}/{}'.format(path ,'abc.jpeg'))
     # print image_requester.upload_image('/etc/hosts')
+
+    # 评论相关
+    comment_requester = ElemeCommontRequester(context_requester, 37018602)
+    print comment_requester.get_comment_list()
+    print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
 
 if __name__ == '__main__':
     main()

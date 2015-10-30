@@ -175,7 +175,7 @@ class ElemeAPIContextRequester(object):
         try:
             connection.request(method, url = url, body = body, headers = headers)
             response = connection.getresponse().read()
-            logger.info('the {} {} response is : '.format(method, response))
+            logger.info('the {} {} response is {} : '.format(method, url, response))
             return json.loads(response)
         except Exception, e:
             #当做重试一次吧
@@ -202,28 +202,33 @@ class ElemeOrderRequester(object):
         return self.context_requester.base_request_get(request_path_url, params)
 
     def get_order_info(self, eleme_order_id):
-        request_path_url = "/order/{}/"
-
         if not eleme_order_id:
             return None
+
+        request_path_url = "/order/{}/"
 
         request_path_url = request_path_url.format(eleme_order_id)
         return self.context_requester.base_request_get(request_path_url)
 
-    def change_order_status(self, eleme_order_id, status):
-        self.request_path_url = '/order/{}/status/'
-
+    def change_order_status(self, eleme_order_id, status, reason = None):
         if not eleme_order_id:
             return None
+
+        request_path_url = '/order/{}/status/'
 
         request_path_url = request_path_url.format(eleme_order_id)
         params = {}
         params['status'] = status
+        if reason:
+            params['reason'] = reason
 
         return self.context_requester.base_request_put(request_path_url, put_params = params)
 
     def confirm_order(self, eleme_order_id):
         return self.change_order_status(eleme_order_id, 2)
+
+    def cancel_order(self, eleme_order_id, reason):
+        return self.change_order_status(eleme_order_id, -1, reason)
 
 
 class ElemeRestaurantRequester(object):
@@ -597,7 +602,8 @@ def main():
     #         print order_ids
     #         break
 
-    # print order_requester.get_order_info(100116454512133715)
+    order_requester.get_order_info(100109710011267401)
+    order_requester.cancel_order(100109710011267401, '开放平台取消')
 
     # 餐厅相关
     # restaurant_requester = ElemeRestaurantRequester(context_requester, '62028381')
@@ -638,11 +644,11 @@ def main():
     # 图片相关
     image_requester = ElemeImageRequester(context_requester)
 
-    print image_requester.get_image_url('a35292a9a7412ddeb01af94aa922a2dcd9798623')
+    # print image_requester.get_image_url('a35292a9a7412ddeb01af94aa922a2dcd9798623')
 
     # path = os.path.split(os.path.realpath(__file__))[0]
-    path = '/Users/Bargetor/Documents/Bargetor/workspace/python/elemeopenapi/elemeopenapi/elemeapi'
-    print image_requester.upload_image('{}/{}'.format(path ,'abc.jpeg'))
+    # path = '/Users/Bargetor/Documents/Bargetor/workspace/python/elemeopenapi/elemeopenapi/elemeapi'
+    # print image_requester.upload_image('{}/{}'.format(path ,'abc.jpeg'))
 
     # 评论相关
     # comment_requester = ElemeCommontRequester(context_requester, 37018602)

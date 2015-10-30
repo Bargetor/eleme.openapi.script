@@ -19,9 +19,9 @@ class ElemeAPIContextRequester(object):
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
-        # self.base_url_path = 'v2.openapi.ele.me'
+        self.base_url_path = 'v2.openapi.ele.me'
         #test
-        self.base_url_path = 'v2.rhyme.alpha.elenet.me'
+        # self.base_url_path = 'v2.rhyme.alpha.elenet.me'
 
 
     def base_request(self, path_url, url_params = {}, params  = {}):
@@ -563,8 +563,8 @@ class ElemeCommontRequester(object):
         return self.context_requester.base_request_get(request_path_url, url_params = params)
 
 
-    def reply(self, comment_id, content, replier_name = None):
-        if not comment_id or not self.restaurant_id:
+    def reply(self, comment_id, content, replier_name):
+        if not comment_id or not self.restaurant_id or not content or not replier_name:
             return None
 
         request_path_url = '/comment/{}/reply/'.format(self.restaurant_id)
@@ -597,10 +597,10 @@ def main():
     #         print order_ids
     #         break
 
-    # print order_requester.get_order_info(100106410220276161)
+    # print order_requester.get_order_info(100116454512133715)
 
     # 餐厅相关
-    # restaurant_requester = ElemeRestaurantRequester(context_requester, '68557502')
+    # restaurant_requester = ElemeRestaurantRequester(context_requester, '62028381')
     # restaurant_requester.get_restaurant_info()
     # all_categories = restaurant_requester.get_all_categories()['data']['food_categories']
     # print all_categories
@@ -638,16 +638,16 @@ def main():
     # 图片相关
     image_requester = ElemeImageRequester(context_requester)
 
-    # print image_requester.get_image_url('a35292a9a7412ddeb01af94aa922a2dcd9798623')
+    print image_requester.get_image_url('a35292a9a7412ddeb01af94aa922a2dcd9798623')
 
     # path = os.path.split(os.path.realpath(__file__))[0]
-    # print image_requester.upload_image('{}/{}'.format(path ,'abc.jpeg'))
-    # print image_requester.upload_image('/etc/hosts')
+    path = '/Users/Bargetor/Documents/Bargetor/workspace/python/elemeopenapi/elemeopenapi/elemeapi'
+    print image_requester.upload_image('{}/{}'.format(path ,'abc.jpeg'))
 
     # 评论相关
-    comment_requester = ElemeCommontRequester(context_requester, 37018602)
-    print comment_requester.get_comment_list()
-    print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
+    # comment_requester = ElemeCommontRequester(context_requester, 37018602)
+    # print comment_requester.get_comment_list()
+    # print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
 
 if __name__ == '__main__':
     main()

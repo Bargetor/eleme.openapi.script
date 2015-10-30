@@ -69,10 +69,9 @@ class ElemeAPIContextRequester(object):
             logger.info('the {} response is {}'.format(path_url, response))
             return json.loads(response)
         except Exception, e:
+            logger.error(e)
             return self.base_request_upload(path_url, url_params, upload_params)
 
-        # response = self.__put(request_path_url, upload_params, headers)
-        # return response
 
     def download(self, url, download_path, file_name):
         response = urllib.urlopen(url)
@@ -179,7 +178,7 @@ class ElemeAPIContextRequester(object):
             return json.loads(response)
         except Exception, e:
             #当做重试一次吧
-            print e
+            logger.error(e)
             return self.__open_url(url, method, params, headers)
 
         # return response
@@ -548,10 +547,10 @@ class ElemeImageRequester(object):
 
         return self.context_requester.base_request_upload(request_path_url, upload_params = params)
 
-class ElemeCommontRequester(object):
-    """docstring for ElemeCommontRequester"""
+class ElemeCommentRequester(object):
+    """docstring for ElemeCommentRequester"""
     def __init__(self, context_requester, restaurant_id = None):
-        super(ElemeCommontRequester, self).__init__()
+        super(ElemeCommentRequester, self).__init__()
         self.context_requester = context_requester
         self.restaurant_id = restaurant_id
 
@@ -603,7 +602,7 @@ def main():
     #         break
 
     order_requester.get_order_info(100109710011267401)
-    order_requester.cancel_order(100109710011267401, '开放平台取消')
+    # order_requester.cancel_order(100109710011267401, '开放平台取消')
 
     # 餐厅相关
     # restaurant_requester = ElemeRestaurantRequester(context_requester, '62028381')
@@ -651,9 +650,9 @@ def main():
     # print image_requester.upload_image('{}/{}'.format(path ,'abc.jpeg'))
 
     # 评论相关
-    # comment_requester = ElemeCommontRequester(context_requester, 37018602)
-    # print comment_requester.get_comment_list()
-    # print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
+    comment_requester = ElemeCommentRequester(context_requester, 37018602)
+    print comment_requester.get_comment_list()
+    print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
 
 if __name__ == '__main__':
     main()

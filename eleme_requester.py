@@ -6,8 +6,11 @@ import sys
 import os
 import binascii
 import eleme_application_set
+import base
 reload(sys)
 sys.setdefaultencoding('utf-8')
+
+logger = base.get_logger(os.path.basename(__file__))
 
 text_geo = [{"geometry": {"type": "Polygon", "coordinates": [[[121.381303, 31.243521], [121.380938, 31.242778], [121.380735, 31.242421], [121.380627, 31.242196], [121.380541, 31.24204], [121.38037, 31.241664], [121.380284, 31.241499], [121.38023, 31.241389], [121.380166, 31.241269], [121.380134, 31.241178], [121.379951, 31.24093], [121.379748, 31.24071], [121.379565, 31.240499], [121.379426, 31.24037], [121.379297, 31.240205], [121.379104, 31.239967], [121.378911, 31.239747], [121.378696, 31.239471], [121.377881, 31.238554], [121.377291, 31.237848], [121.376561, 31.237077], [121.37566, 31.236013], [121.375123, 31.235435], [121.374684, 31.234967], [121.374265, 31.234499], [121.374126, 31.23427], [121.374072, 31.234105], [121.374029, 31.233912], [121.3739, 31.233334], [121.373782, 31.232738], [121.373675, 31.232334], [121.3736, 31.231967], [121.373342, 31.230821], [121.374319, 31.23038], [121.375542, 31.22983], [121.377065, 31.229133], [121.377913, 31.228775], [121.378857, 31.228545], [121.37964, 31.228399], [121.381539, 31.228096], [121.382891, 31.227903], [121.38361, 31.229628], [121.384661, 31.231977], [121.385713, 31.23449], [121.386753, 31.236527], [121.386764, 31.236554], [121.387183, 31.237426], [121.387504, 31.238095], [121.388213, 31.239499], [121.388695, 31.24049], [121.387912, 31.240701], [121.386839, 31.240985], [121.385766, 31.241315], [121.385251, 31.241389], [121.383728, 31.24226], [121.381582, 31.243361], [121.381679, 31.243297], [121.381303, 31.243521]]]}, "type": "Feature", "properties": {"delivery_price": 20}}]
 
@@ -60,11 +63,10 @@ class ElemeAPIContextRequester(object):
 
         connection = self.__get_http_connection()
         # body = urllib.urlencode(params)
-        print request_path_url
         try:
             connection.request('POST', url = request_path_url, body = body, headers = headers)
             response = connection.getresponse().read()
-            print response
+            logger.info('the {} response is {}'.format(path_url, response))
             return json.loads(response)
         except Exception, e:
             return self.base_request_upload(path_url, url_params, upload_params)
@@ -77,7 +79,7 @@ class ElemeAPIContextRequester(object):
         download_file = open("{}/{}".format(download_path, file_name), 'wb')
         download_file.write(response.read())
         download_file.close()
-        print "download url:{} to {}/{}".format(url, download_path, file_name)
+        logger.info("download url:{} to {}/{}".format(url, download_path, file_name))
 
     def __encode_multipart_formdata(self, file_name, file_data):
         """
@@ -104,16 +106,14 @@ class ElemeAPIContextRequester(object):
 
     def gen_sig(self, path_url, params, consumer_secret):
         params = self.concat_params(params)
-        print 'the params is : %s' % (params)
 
         url = u'{}?{}{}'.format(path_url, params, consumer_secret)
-        print 'the url is : %s' % (url)
 
         to_hash = url.encode('utf-8').encode('hex')
-        print 'the to_hash is : %s' % (to_hash)
 
         sig = hashlib.new('sha1', to_hash).hexdigest()
-        print 'the sig is : %s' % (sig)
+
+        # logger.info('the path_url is : {} and params is : {} and to_hash is : {} and sig is : {}'.format(path_url, params, to_hash, sig))
         return sig
 
     def concat_params(self, params):
@@ -170,12 +170,12 @@ class ElemeAPIContextRequester(object):
 
     def __open_url(self, url, method = 'GET', params = {}, headers = {}):
         connection = self.__get_http_connection()
-        print 'the %s request url is : %s' % (method, url)
         body = urllib.urlencode(params)
+        logger.info('the {} request url is : {} , and body is {}'.format(method, url, body))
         try:
             connection.request(method, url = url, body = body, headers = headers)
             response = connection.getresponse().read()
-            print response
+            logger.info('the {} {} response is : '.format(method, response))
             return json.loads(response)
         except Exception, e:
             #当做重试一次吧
@@ -521,7 +521,7 @@ class ElemeImageRequester(object):
         return self.context_requester.base_request_get(request_path_url)
 
     def upload_image(self, image_name):
-        print 'upload image, name is {}'.format(image_name)
+        logger.info('upload image, name is {}'.format(image_name))
         if not image_name:
             return None
 

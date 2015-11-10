@@ -200,14 +200,18 @@ class ElemeOrderRequester(object):
 
         return self.context_requester.base_request_get(request_path_url, params)
 
-    def get_order_info(self, eleme_order_id):
+    def get_order_info(self, eleme_order_id, is_use_tp_id = False):
         if not eleme_order_id:
             return None
 
         request_path_url = "/order/{}/"
 
+        params = {}
+        if is_use_tp_id:
+            params['tp_id'] = 1
+
         request_path_url = request_path_url.format(eleme_order_id)
-        return self.context_requester.base_request_get(request_path_url)
+        return self.context_requester.base_request_get(request_path_url, url_params = params)
 
     def change_order_status(self, eleme_order_id, status, reason = None):
         if not eleme_order_id:
@@ -508,6 +512,13 @@ class ElemeFoodRequester(object):
 
         return self.context_requester.base_request_put(request_path_url, put_params = params)
 
+    def delete(self):
+        if not self.food_id:
+            return None
+
+        request_path_url = '/food/{}/'.format(self.food_id)
+        return self.context_requester.base_request_delete(request_path_url)
+
 
 class ElemeImageRequester(object):
     """docstring for ElemeImageRequester"""
@@ -601,11 +612,12 @@ def main():
     #         print order_ids
     #         break
 
-    order_requester.get_order_info(100109710011267401)
-    # order_requester.cancel_order(100109710011267401, '开放平台取消')
+    order_requester.get_order_info(100147321377401161, is_use_tp_id = True)
+    order_requester.confirm_order(100147321377401161)
+    # order_requester.cancel_order(100147321377401161, '开放平台取消')
 
     # 餐厅相关
-    # restaurant_requester = ElemeRestaurantRequester(context_requester, '62028381')
+    # restaurant_requester = ElemeRestaurantRequester(context_requester, '62671548')
     # restaurant_requester.get_restaurant_info()
     # all_categories = restaurant_requester.get_all_categories()['data']['food_categories']
     # print all_categories
@@ -634,14 +646,15 @@ def main():
 
 
     # 食物相关
-    # food_requester = ElemeFoodRequester(context_requester)
+    food_requester = ElemeFoodRequester(context_requester)
     # stock_info_json = {'4739284732': {'432432': '中文', '432423': 10}, "43242": {"43242112":399}}
     # print food_requester.update_stock_by_tp_id(stock_info_json)
 
-    # print food_requester.create_new('2801170', '川菜', price = 15.5)
+    # print food_requester.create_new('4055272', '川菜', price = 15.5)
+    # print food_requester.delete()
 
     # 图片相关
-    image_requester = ElemeImageRequester(context_requester)
+    # image_requester = ElemeImageRequester(context_requester)
 
     # print image_requester.get_image_url('a35292a9a7412ddeb01af94aa922a2dcd9798623')
 
@@ -650,9 +663,9 @@ def main():
     # print image_requester.upload_image('{}/{}'.format(path ,'abc.jpeg'))
 
     # 评论相关
-    comment_requester = ElemeCommentRequester(context_requester, 37018602)
-    print comment_requester.get_comment_list()
-    print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
+    # comment_requester = ElemeCommentRequester(context_requester, 37018602)
+    # print comment_requester.get_comment_list()
+    # print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
 
 if __name__ == '__main__':
     main()

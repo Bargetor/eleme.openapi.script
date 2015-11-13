@@ -12,7 +12,7 @@ sys.setdefaultencoding('utf-8')
 
 logger = base.get_logger(os.path.basename(__file__))
 
-text_geo = [{"geometry": {"type": "Polygon", "coordinates": [[[121.381303, 31.243521], [121.380938, 31.242778], [121.380735, 31.242421], [121.380627, 31.242196], [121.380541, 31.24204], [121.38037, 31.241664], [121.380284, 31.241499], [121.38023, 31.241389], [121.380166, 31.241269], [121.380134, 31.241178], [121.379951, 31.24093], [121.379748, 31.24071], [121.379565, 31.240499], [121.379426, 31.24037], [121.379297, 31.240205], [121.379104, 31.239967], [121.378911, 31.239747], [121.378696, 31.239471], [121.377881, 31.238554], [121.377291, 31.237848], [121.376561, 31.237077], [121.37566, 31.236013], [121.375123, 31.235435], [121.374684, 31.234967], [121.374265, 31.234499], [121.374126, 31.23427], [121.374072, 31.234105], [121.374029, 31.233912], [121.3739, 31.233334], [121.373782, 31.232738], [121.373675, 31.232334], [121.3736, 31.231967], [121.373342, 31.230821], [121.374319, 31.23038], [121.375542, 31.22983], [121.377065, 31.229133], [121.377913, 31.228775], [121.378857, 31.228545], [121.37964, 31.228399], [121.381539, 31.228096], [121.382891, 31.227903], [121.38361, 31.229628], [121.384661, 31.231977], [121.385713, 31.23449], [121.386753, 31.236527], [121.386764, 31.236554], [121.387183, 31.237426], [121.387504, 31.238095], [121.388213, 31.239499], [121.388695, 31.24049], [121.387912, 31.240701], [121.386839, 31.240985], [121.385766, 31.241315], [121.385251, 31.241389], [121.383728, 31.24226], [121.381582, 31.243361], [121.381679, 31.243297], [121.381303, 31.243521]]]}, "type": "Feature", "properties": {"delivery_price": 20}}]
+test_geo = [{"geometry": {"type": "Polygon", "coordinates": [[[121.381303, 31.243521], [121.380938, 31.242778], [121.380735, 31.242421], [121.380627, 31.242196], [121.380541, 31.24204], [121.38037, 31.241664], [121.380284, 31.241499], [121.38023, 31.241389], [121.380166, 31.241269], [121.380134, 31.241178], [121.379951, 31.24093], [121.379748, 31.24071], [121.379565, 31.240499], [121.379426, 31.24037], [121.379297, 31.240205], [121.379104, 31.239967], [121.378911, 31.239747], [121.378696, 31.239471], [121.377881, 31.238554], [121.377291, 31.237848], [121.376561, 31.237077], [121.37566, 31.236013], [121.375123, 31.235435], [121.374684, 31.234967], [121.374265, 31.234499], [121.374126, 31.23427], [121.374072, 31.234105], [121.374029, 31.233912], [121.3739, 31.233334], [121.373782, 31.232738], [121.373675, 31.232334], [121.3736, 31.231967], [121.373342, 31.230821], [121.374319, 31.23038], [121.375542, 31.22983], [121.377065, 31.229133], [121.377913, 31.228775], [121.378857, 31.228545], [121.37964, 31.228399], [121.381539, 31.228096], [121.382891, 31.227903], [121.38361, 31.229628], [121.384661, 31.231977], [121.385713, 31.23449], [121.386753, 31.236527], [121.386764, 31.236554], [121.387183, 31.237426], [121.387504, 31.238095], [121.388213, 31.239499], [121.388695, 31.24049], [121.387912, 31.240701], [121.386839, 31.240985], [121.385766, 31.241315], [121.385251, 31.241389], [121.383728, 31.24226], [121.381582, 31.243361], [121.381679, 31.243297], [121.381303, 31.243521]]]}, "type": "Feature", "properties": {"delivery_price": 20}}, {"geometry": {"type": "Polygon", "coordinates": [[[121.481746, 31.222286], [121.489723, 31.224633], [121.492957, 31.21753], [121.48383, 31.21543]]]}, "type": "Feature", "properties": {"delivery_price": 0}}]
 
 
 class ElemeAPIContextRequester(object):
@@ -22,9 +22,9 @@ class ElemeAPIContextRequester(object):
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
-        self.base_url_path = 'v2.openapi.ele.me'
+        # self.base_url_path = 'v2.openapi.ele.me'
         #test
-        # self.base_url_path = 'v2.rhyme.alpha.elenet.me'
+        self.base_url_path = 'v2.rhyme.alpha.elenet.me'
 
 
     def base_request(self, path_url, url_params = {}, params  = {}):
@@ -565,6 +565,13 @@ class ElemeCommentRequester(object):
         self.context_requester = context_requester
         self.restaurant_id = restaurant_id
 
+    def get_comment_count(self):
+        if not self.restaurant_id:
+            return None
+
+        request_path_url = '/comment/{}/count/'.format(self.restaurant_id)
+        return self.context_requester.base_request_get(request_path_url)
+
     def get_comment_list(self, offset = 1, limit = 20):
         if not self.restaurant_id:
             return None
@@ -612,17 +619,17 @@ def main():
     #         print order_ids
     #         break
 
-    order_requester.get_order_info(100147321377401161, is_use_tp_id = True)
-    order_requester.confirm_order(100147321377401161)
+    # order_requester.get_order_info(100147321377401161, is_use_tp_id = True)
+    # order_requester.confirm_order(100154996248234313)
     # order_requester.cancel_order(100147321377401161, '开放平台取消')
 
     # 餐厅相关
-    # restaurant_requester = ElemeRestaurantRequester(context_requester, '62671548')
+    # restaurant_requester = ElemeRestaurantRequester(context_requester, 26730582)
     # restaurant_requester.get_restaurant_info()
     # all_categories = restaurant_requester.get_all_categories()['data']['food_categories']
     # print all_categories
 
-    # print restaurant_requester.get_restaurant_by_tp_id('26823299')
+    # print restaurant_requester.get_restaurant_by_tp_id('lip')
     # for category in all_categories:
     #     print category
     #     food_category_requester = ElemeCategoryRequester(context_requester, category['food_category_id'])
@@ -630,24 +637,25 @@ def main():
 
 
     # print restaurant_requester.get_restaurant_by_tp_id('96000')
-    # print restaurant_requester.binding('96553')
+    # print restaurant_requester.rebinding('lip')
     # print restaurant_requester.update_restaurant_phone('87654321')
-    # print restaurant_requester.update_restaurant_name('Open API 测试餐厅')
+    # print restaurant_requester.update_restaurant_name('必胜宅急送测试餐厅100')
     # print restaurant_requester.update_restaurant_address('武侯区科院街5号(近领事馆路棕北中学)')
     # print restaurant_requester.update_restaurant_open_time('9:00-22:00')
-    # print restaurant_requester.set_geo(text_geo)
+    # print restaurant_requester.set_geo(test_geo)
+    # restaurant_requester.open_restaurant()
 
 
     # 分类相关
-    # food_category_requester = ElemeCategoryRequester(context_requester, '3371496')
+    # food_category_requester = ElemeCategoryRequester(context_requester, '197739')
 
     # print food_category_requester.get_all_foods()
     # print food_category_requester.create_new(62028381, '川菜', 100)
 
 
     # 食物相关
-    food_requester = ElemeFoodRequester(context_requester)
-    # stock_info_json = {'4739284732': {'432432': '中文', '432423': 10}, "43242": {"43242112":399}}
+    # food_requester = ElemeFoodRequester(context_requester)
+    # stock_info_json = {'lip': {'lip-food': 999, '110' : 1000}}
     # print food_requester.update_stock_by_tp_id(stock_info_json)
 
     # print food_requester.create_new('4055272', '川菜', price = 15.5)
@@ -663,9 +671,10 @@ def main():
     # print image_requester.upload_image('{}/{}'.format(path ,'abc.jpeg'))
 
     # 评论相关
-    # comment_requester = ElemeCommentRequester(context_requester, 37018602)
+    comment_requester = ElemeCommentRequester(context_requester, 87257372)
     # print comment_requester.get_comment_list()
     # print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
+    comment_requester.get_comment_count()
 
 if __name__ == '__main__':
     main()

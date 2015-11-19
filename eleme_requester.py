@@ -565,6 +565,13 @@ class ElemeCommentRequester(object):
         self.context_requester = context_requester
         self.restaurant_id = restaurant_id
 
+    def get_comment_count(self):
+        if not self.restaurant_id:
+            return None
+
+        request_path_url = '/comment/{}/count/'.format(self.restaurant_id)
+        return self.context_requester.base_request_get(request_path_url)
+
     def get_comment_list(self, offset = 1, limit = 20):
         if not self.restaurant_id:
             return None
@@ -592,7 +599,7 @@ class ElemeCommentRequester(object):
         return self.context_requester.base_request_post(request_path_url, post_params = params)
 
 def main():
-    application = eleme_application_set.eleme_application_set['test']
+    application = eleme_application_set.eleme_application_set['bsz']
     context_requester = ElemeAPIContextRequester(application.consumer_key, application.consumer_secret)
 
     # 查询所属餐厅
@@ -612,8 +619,8 @@ def main():
     #         print order_ids
     #         break
 
-    order_requester.get_order_info(100147321377401161, is_use_tp_id = True)
-    order_requester.confirm_order(100147321377401161)
+    # order_requester.get_order_info(100147321377401161, is_use_tp_id = True)
+    # order_requester.confirm_order(100147321377401161)
     # order_requester.cancel_order(100147321377401161, '开放平台取消')
 
     # 餐厅相关
@@ -664,8 +671,10 @@ def main():
 
     # 评论相关
     # comment_requester = ElemeCommentRequester(context_requester, 37018602)
+    # comment_requester.get_comment_count()
     # print comment_requester.get_comment_list()
     # print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
+
 
 if __name__ == '__main__':
     main()

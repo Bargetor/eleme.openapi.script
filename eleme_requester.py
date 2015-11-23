@@ -22,9 +22,9 @@ class ElemeAPIContextRequester(object):
         self.consumer_key = consumer_key
         self.consumer_secret = consumer_secret
 
-        self.base_url_path = 'v2.openapi.ele.me'
+        # self.base_url_path = 'v2.openapi.ele.me'
         #test
-        # self.base_url_path = 'v2.rhyme.alpha.elenet.me'
+        self.base_url_path = 'v2.rhyme.alpha.elenet.me'
 
 
     def base_request(self, path_url, url_params = {}, params  = {}):
@@ -390,6 +390,56 @@ class ElemeRestaurantRequester(object):
         params['is_bookable'] = is_bookable
         return self.update_restaurant_info(params)
 
+
+class ElemeActivityRequester(object):
+    """docstring for ElemeActivityRequester"""
+    def __init__(self, context_requester):
+        super(ElemeActivityRequester, self).__init__()
+        self.context_requester = context_requester
+
+    def get_restaurant_activity_list(self, restaurant_id):
+        if not restaurant_id:
+            return None
+
+        request_path_url = '/activity/{}/restaurant/'.format(restaurant_id)
+
+        return self.context_requester.base_request_get(request_path_url)
+
+    def get_food_activity_list(self, restaurant_id, weekdays = '1,2,3,4,5,6,7'):
+        if not restaurant_id:
+            return None
+
+        request_path_url = '/activity/{}/food/'.format(restaurant_id)
+        params = {}
+        params['weekdays'] = weekdays
+
+        return self.context_requester.base_request_get(request_path_url, url_params = params)
+
+    def get_restaurant_activity_info(self, restaurant_id, activity_id):
+        if not restaurant_id or not activity_id:
+            return None
+
+
+        request_path_url = '/activity/{}/restaurant_detail/'.format(restaurant_id)
+
+        params = {}
+        params['activity_id'] = activity_id
+
+        return self.context_requester.base_request_get(request_path_url, url_params = params)
+
+    def get_food_activity_info(self, restaurant_id, activity_id):
+        if not restaurant_id or not activity_id:
+            return None
+
+
+        request_path_url = '/activity/{}/food_detail/'.format(restaurant_id)
+
+        params = {}
+        params['activity_id'] = activity_id
+
+        return self.context_requester.base_request_get(request_path_url, url_params = params)
+
+
 class ElemeOwnRestaurantsRequester(object):
     """docstring for OwnRestaurantsRequester"""
     def __init__(self, context_requester):
@@ -565,6 +615,13 @@ class ElemeCommentRequester(object):
         self.context_requester = context_requester
         self.restaurant_id = restaurant_id
 
+    def get_comment_count(self):
+        if not self.restaurant_id:
+            return None
+
+        request_path_url = '/comment/{}/count/'.format(self.restaurant_id)
+        return self.context_requester.base_request_get(request_path_url)
+
     def get_comment_list(self, offset = 1, limit = 20):
         if not self.restaurant_id:
             return None
@@ -612,8 +669,8 @@ def main():
     #         print order_ids
     #         break
 
-    order_requester.get_order_info(100147321377401161, is_use_tp_id = True)
-    order_requester.confirm_order(100147321377401161)
+    # order_requester.get_order_info(100147321377401161, is_use_tp_id = True)
+    # order_requester.confirm_order(100147321377401161)
     # order_requester.cancel_order(100147321377401161, '开放平台取消')
 
     # 餐厅相关
@@ -664,8 +721,18 @@ def main():
 
     # 评论相关
     # comment_requester = ElemeCommentRequester(context_requester, 37018602)
+    # comment_requester.get_comment_count()
     # print comment_requester.get_comment_list()
     # print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
+
+    # 活动相关
+    activity_requester = ElemeActivityRequester(context_requester)
+    activity_requester.get_restaurant_activity_list(78568340)
+    activity_requester.get_food_activity_list(76135190)
+    activity_requester.get_restaurant_activity_info(78568340, 53910)
+    activity_requester.get_food_activity_info(76135190, 1530)
+
+
 
 if __name__ == '__main__':
     main()

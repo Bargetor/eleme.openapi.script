@@ -390,6 +390,17 @@ class ElemeRestaurantRequester(object):
         params['is_bookable'] = is_bookable
         return self.update_restaurant_info(params)
 
+    def get_restaurants_status(self, restaurant_ids = []):
+        if not restaurant_ids:
+            return None
+
+        params = {}
+        params['restaurant_id'] = ','.join(str(id) for id in restaurant_ids)
+
+        request_path_url = '/restaurants/batch_status/'
+
+        return self.context_requester.base_request_get(request_path_url, url_params = params)
+
 
 class ElemeActivityRequester(object):
     """docstring for ElemeActivityRequester"""
@@ -674,7 +685,7 @@ def main():
     # order_requester.cancel_order(100147321377401161, '开放平台取消')
 
     # 餐厅相关
-    # restaurant_requester = ElemeRestaurantRequester(context_requester, '62671548')
+    restaurant_requester = ElemeRestaurantRequester(context_requester, '62671548')
     # restaurant_requester.get_restaurant_info()
     # all_categories = restaurant_requester.get_all_categories()['data']['food_categories']
     # print all_categories
@@ -693,6 +704,7 @@ def main():
     # print restaurant_requester.update_restaurant_address('武侯区科院街5号(近领事馆路棕北中学)')
     # print restaurant_requester.update_restaurant_open_time('9:00-22:00')
     # print restaurant_requester.set_geo(text_geo)
+    restaurant_requester.get_restaurants_status([78568340,48745726,87257372,26754533,23938260,60832090,37018602,26730582,46811398,47041918,57400591,70718174,76135190,999999,888888])
 
 
     # 分类相关
@@ -726,11 +738,11 @@ def main():
     # print comment_requester.reply(832, 'test', replier_name = 'xiaosi')
 
     # 活动相关
-    activity_requester = ElemeActivityRequester(context_requester)
-    activity_requester.get_restaurant_activity_list(78568340)
-    activity_requester.get_food_activity_list(76135190)
-    activity_requester.get_restaurant_activity_info(78568340, 53910)
-    activity_requester.get_food_activity_info(76135190, 1530)
+    # activity_requester = ElemeActivityRequester(context_requester)
+    # activity_requester.get_restaurant_activity_list(78568340)
+    # activity_requester.get_food_activity_list(76135190)
+    # activity_requester.get_restaurant_activity_info(78568340, 53910)
+    # activity_requester.get_food_activity_info(76135190, 1530)
 
 
 
